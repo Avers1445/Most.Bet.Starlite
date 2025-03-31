@@ -2,26 +2,47 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Редирект</title>
+  <title>Реферальный редирект</title>
   <script>
+    const subIds = ["sub1", "sub2", "sub3"];
+
+    function getNextSubId() {
+      let currentIndex = localStorage.getItem("currentSubIndex");
+      if (currentIndex === null) {
+        currentIndex = 0;
+      } else {
+        currentIndex = parseInt(currentIndex, 10);
+      }
+      const chosenSubId = subIds[currentIndex];
+      currentIndex = (currentIndex + 1) % subIds.length;
+      localStorage.setItem("currentSubIndex", currentIndex);
+      return chosenSubId;
+    }
+
     window.onload = function() {
-      var params = new URLSearchParams(window.location.search);
-      var username = params.get('username') || "";
-      var scriptUrl = "https://script.google.com/macros/s/AKfycbz7PhSULN-WNuf_XA1b4SCJPWNW1O5Ttqny4kf8ZHf_DovJtQyKn04i0wRKSJicBJIl/exec?username=" + encodeURIComponent(username);
-      var referralUrl = "https://ame1a56mb.com/1xBF?sub_id=%7Bclick_id%7D";
-      var timeoutPromise = new Promise(function(resolve) {
-        setTimeout(resolve, 1000, "timeout");
-      });
-      var fetchPromise = fetch(scriptUrl)
-        .then(function(response) { return response.text(); })
-        .catch(function(error) { console.error("Ошибка fetch:", error); });
-      Promise.race([fetchPromise, timeoutPromise]).then(function() {
-        window.location.href = referralUrl;
-      });
+      const params = new URLSearchParams(window.location.search);
+      const username = params.get("username") || "";
+      const telegram_id = params.get("telegram_id") || "";
+      const subId = getNextSubId();
+
+      const registrationUrl = "https://script.google.com/macros/s/AKfycbyV_SYAkZZw0u0CRF_QoaXl0PgMfhPMAryqUqopFbcTirODPxeXKkAUR6xnDXMIpLgx/exec" +
+                              "?username=" + encodeURIComponent(username) +
+                              "&sub_id=" + encodeURIComponent(subId) +
+                              "&telegram_id=" + encodeURIComponent(telegram_id);
+
+      const referralUrl = "https://ame1a56mb.com/1xBF?sub_id=" + encodeURIComponent(subId);
+
+      fetch(registrationUrl)
+        .then(response => response.text())
+        .finally(() => {
+          setTimeout(function() {
+            window.location.href = referralUrl;
+          }, 1000);
+        });
     };
   </script>
 </head>
 <body>
-  <p>Lütfen bekleyiniz, yönlendiriliyorsunuz...</p>
+  <p>Подождите, идет перенаправление...</p>
 </body>
 </html>
